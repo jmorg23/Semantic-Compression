@@ -4,6 +4,9 @@ import threading
 from groq_api_key import key
 from groq import Groq
 
+
+# from server.Modules import get_conversations, get_uuid
+from Modules import get_messages, start_conversation
 client = Groq(
     api_key=key
 )
@@ -26,6 +29,8 @@ class Client:
         json_str = json.dumps(message.__dict__)
         # print(json_str)
         connection.sendall(json_str.encode())
+
+
     def loop(self):
         while True:
             connection = self.connection
@@ -37,7 +42,24 @@ class Client:
             message = data.decode()
             print("Received:", message)
             message = json.loads(message)
-            input_message = InputMessage(**message)
+            try:
+                input_message = InputMessage(**message)
+                print("type is a input message")
+            except Exception as e:
+                # print("e: ",e)
+                try:
+                    input_message = ChangeConvo(**message)
+                    connection.sendall(get_messages(input_message.uuid,input_message.cuuid))
+                    print("type is a change convo")
+
+                    #change model
+                    continue
+                except Exception as e:
+                    input_message = CreateConvo(**message)
+                    connection.sendall(start_conversation(input_message.uuid,input_message.prompt)) 
+                    print("type is a Create Convo")
+               
+                continue
             message = input_message.content
             timestamp = input_message.timestamp
             limit = input_message.limit
@@ -58,12 +80,12 @@ class Client:
                 if chunk.choices[0].delta.content:
                     message += chunk.choices[0].delta.content
                     token = chunk.choices[0].delta.content
-                    print(Message(token.strip(), 0))
-                    # self.send_message(Message(token.strip(), 0)) #!-----------------------------
+                # print(Message(token.strip(), 0))
+                    # self.send_message(Message(token.strip(), 0)) 
                     # print(chunk.choices[0].delta.content, end="", flush=True)
             
             self.send_message(Message(message, -1))
-            print(Message(message, -1).message)
+            # print(Message(message, -1).message)
 
             self.messages.append({"role": "assistant", "content": message})
 
@@ -106,6 +128,18 @@ class ServerMain:
                 
                 
                 print("id: "+client_info.id)
+
+                # Checks for null id and assigns a new one if not
+                # if(client_info.id == ""):
+
+                #     client_info.id = get_uuid()
+                #     #client_info.id = "boom"
+                #     connection.sendall(client_info.id.encode())
+
+                # else:
+                #     connection.sendall(get_conversations(client_info.id))
+
+
                 client = Client(connection,client_info.id)
                 threading.Thread(target=client.loop()).start()
                 
@@ -125,9 +159,21 @@ class ServerMain:
         print("Server is listening on", server_address)
         self.handle_connections(server_socket)
 
- 
+class CreateConvo:
+    prompt:str
+    uuid:str
+    def __init__(self, prompt, uuid):
+        self.prompt = prompt
+        self.uuid = uuid
+        
 
-
+class ChangeConvo:
+    cuuid: str
+    uuid: str
+       
+    def __init__(self, cuuid, uuid):
+        self.cuuid = cuuid
+        self.uuid = uuid 
 
 class Message:
     message: str

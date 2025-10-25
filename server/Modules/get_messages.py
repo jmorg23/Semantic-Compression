@@ -6,3 +6,7 @@ def get_messages(user_uuid:str, conversation_uuid:str):
 
     with open(convo_path, "r") as f:
         return json.load(f)["messages"]
+    
+
+if __name__ == "__main__":
+    get_messages('asdasdasds', 'assdasd')

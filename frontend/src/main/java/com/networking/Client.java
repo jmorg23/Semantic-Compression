@@ -2,12 +2,16 @@ package com.networking;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ui.Conversation;
+import com.ui.Panel;
 
 public class Client {
 
@@ -22,42 +26,89 @@ public class Client {
     public ObjectMapper mapper = new ObjectMapper();
 
     public ClientInfo myInfo;
+    private String uuid;
 
     public Client() {
 
-        myInfo = new ClientInfo("John Wick");
+        myInfo = new ClientInfo("");
         try {
             System.out.println("attempting to connect to server at " + IP_ADDRESS + " on port " + PORT);
             socket = new Socket(IP_ADDRESS, PORT);
             os = new BufferedOutputStream(socket.getOutputStream());
             is = new BufferedInputStream(socket.getInputStream());
             System.out.println("connected to server!");
-            System.out.println("sending info: ");
+            System.out.println("sending UUID: ");
+            FileInputStream fis = new FileInputStream(getClass().getResource("uuid.txt").getPath());
+            String id = new String(fis.readAllBytes());
+            myInfo.setId(id.trim());
+            uuid = id;
+            fis.close();
+
+            System.out.println("UUID: " + myInfo.getId());
 
             os.write(mapper.writeValueAsString(myInfo).getBytes());
             os.flush();
+            if (id.equals("")) {
+                System.out.println("UUID is empty! will wait for new one");
+                byte[] buffer = new byte[1024];
+                is.read(buffer);
+                id = new String(buffer).trim();
+                myInfo.setId(id);
+                uuid = id;
 
+                System.out.println("received new UUID from server: " + myInfo.getId());
+                System.out.println("saving UUID to uuid.txt");
+                FileOutputStream fout = new FileOutputStream(getClass().getResource("uuid.txt").getPath());
+                fout.write(id.getBytes());
+                fout.flush();
+                fout.close();
+            } else {
+                // byte[] buffer = new byte[1024];
+                // is.read(buffer);
+                // Conversations convos = mapper.readValue( new String(buffer).trim(),
+                // Conversations.class);
+                // Panel.addConvos(convos.conversationMap);
 
+            }
+            System.out.println("connection done!");
             // os.write(mapper.writeValueAsString(s.nextLine()).getBytes());
             // os.flush();
-            
-
-            
 
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(0);
         }
 
     }
-    // public void sendMessage(String message) {
-    //     try {
-    //         os.write(mapper.writeValueAsString(message).getBytes());
-    //         os.flush();
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
 
-    //     }
-    // }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public com.ui.Response newConversation(String userIn, Conversation con) {
+        ConversationStarter convo = new ConversationStarter();
+        convo.setUuid(uuid);
+        convo.setPrompt(userIn);
+        try {
+            os.write(mapper.writeValueAsString(convo).getBytes());
+            os.flush();
+
+            byte[] buffer = new byte[1024];
+            is.read(buffer);
+            ConvoStarter cs = mapper.readValue(new String(buffer), ConvoStarter.class);
+
+            con = new Conversation(cs.cuuid, cs.name);
+            return new com.ui.Response(cs.response, Panel.nexty, true);
+
+        } catch (IOException e) {
+            
+            e.printStackTrace();
+            System.exit(0);
+        }
+        return null;
+    }
+
     public String receiveMessages() {
 
         while (true) {
@@ -67,14 +118,15 @@ public class Client {
 
                 is.read(buffer);
                 String received = new String(buffer).trim();
-                System.out.println("rec: "+received);
+                System.out.println("rec: " + received);
+                
                 Packet packet = mapper.readValue(received, Packet.class);
-                System.out.println("received message: " + packet.getMessage()+ " of type "+packet.getType());
+                System.out.println("received message: " + packet.getMessage() + " of type " + packet.getType());
 
                 return packet.getMessage();
                 // if(packet.getType() == -1) {
-                //    System.out.println("done");
-                //     break;
+                // System.out.println("done");
+                // break;
                 // }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -83,14 +135,14 @@ public class Client {
         }
     }
     // public void sendMessage(String message) {
-    //     try {
-    //         os.write(mapper.writeValueAsString(message).getBytes());
-    //         os.flush();
-    //         receiveMessages();
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
+    // try {
+    // os.write(mapper.writeValueAsString(message).getBytes());
+    // os.flush();
+    // receiveMessages();
+    // } catch (IOException e) {
+    // e.printStackTrace();
 
-    //     }
+    // }
     // }
     public void sendMessage(String message) {
         Message msg = new Message("" + System.currentTimeMillis(), message, 10);
@@ -103,40 +155,99 @@ public class Client {
         }
     }
 
+    public ArrayList<com.ui.Conversation.Message> getMessages(String cuuid){
+        try{
+            os.write(mapper.writeValueAsString(new ChangeConvo(cuuid, uuid)).getBytes());
+            os.flush();
+
+            byte[] buffer = new byte[4096];
+            int read = is.read(buffer);
+            if (read == -1) {
+                return null;
+            }
+            String json = new String(buffer, 0, read).trim();
+            return mapper.readValue(json, mapper.getTypeFactory()
+                    .constructCollectionType(ArrayList.class, com.ui.Conversation.Message.class));
+        }catch(Exception e){
+            System.out.println(e);
+            e.printStackTrace();
+            System.exit(0);
+
+        }
+        return null;
+    }
+    public class ConvoStarter {
+        private String name;
+        private String response;
+        private String cuuid;
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+        public ConvoStarter() {
+        }
+        public ConvoStarter(String name, String response, String cuuid) {
+            this.name = name;
+            this.response = response;
+            this.cuuid = cuuid;
+        }
+        public String getResponse() {
+            return response;
+        }
+        public void setResponse(String response) {
+            this.response = response;
+        }
+        public String getCuuid() {
+            return cuuid;
+        }
+        public void setCuuid(String cuuid) {
+            this.cuuid = cuuid;
+        }
+        
+    }
+    
     public class Response {
         private String role;
         private String content;
         private int type;
+
         public String getRole() {
             return role;
         }
+
         public void setRole(String role) {
             this.role = role;
         }
+
         public String getContent() {
             return content;
         }
+
         public Response() {
         }
+
         public Response(String role, String content, int type) {
             this.role = role;
             this.content = content;
             this.type = type;
         }
+
         public void setContent(String content) {
             this.content = content;
         }
+
         public int getType() {
             return type;
         }
+
         public void setType(int type) {
             this.type = type;
         }
 
-        
-
-
     }
+
     public static class ClientInfo {
 
         private String id;
@@ -181,11 +292,41 @@ public class Client {
         }
 
     }
+    public static class ChangeConvo {
+        private String cuuid;
+        private String uuid;
+
+        public ChangeConvo(String cuuid, String uuid) {
+            this.cuuid = cuuid;
+            this.uuid = uuid;
+        }
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getCuuid() {
+            return cuuid;
+        }
+
+        public ChangeConvo() {
+        }
+
+        public void setCuuid(String cuuid) {
+            this.cuuid = cuuid;
+        }
+        
+        
+    }
 
     public static class Message {
         private String timestamp;
         private String content;
-        private int limit =10;
+        private int limit = 10;
 
         public Message() {
         }
@@ -219,5 +360,37 @@ public class Client {
         public void setLimit(int limit) {
             this.limit = limit;
         }
+    }
+
+
+
+    public class ConversationStarter {
+        private String uuid;
+        private String prompt;
+
+        public String getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(String uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getPrompt() {
+            return prompt;
+        }
+
+        public ConversationStarter() {
+        }
+
+        public void setPrompt(String prompt) {
+            this.prompt = prompt;
+        }
+
+        public ConversationStarter(String uuid, String prompt) {
+            this.uuid = uuid;
+            this.prompt = prompt;
+        }
+
     }
 }

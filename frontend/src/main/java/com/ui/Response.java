@@ -31,7 +31,7 @@ public class Response  {
     //             "\r\n" + //
     //             "Would you like me to show how to overlay a transparent `JTextArea` **on top of a background image or custom canvas** (like in a chat UI or game)?\r\n" + //
     //             "";
-    public Response(String message, int ypos){
+    public Response(String message, int ypos, boolean inc){
         this.message = message;
         this.y = ypos;
         // message = con;
@@ -51,7 +51,12 @@ public class Response  {
         label.setBounds(x, y, 1000, 2000);
         Dimension size = label.getPreferredSize();
         Panel.nexty+=size.height+50;
+        if(!inc){
+
         label.setText("");
+        }else{
+            index = message.length();
+        }
 
 
 

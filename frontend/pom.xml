@@ -17,11 +17,19 @@
 
   
     </dependency>
-<dependency>
+
+    <dependency>
+    <groupId>javazoom</groupId>
+    <artifactId>jlayer</artifactId>
+    <version>1.0.1</version>
+</dependency>
+
+
+<!-- <dependency>
   <groupId>com.mylib</groupId>
   <artifactId>jutil</artifactId>
   <version>1.0.0</version>
-</dependency>
+</dependency> -->
 
     <dependency>
     <groupId>com.vladsch.flexmark</groupId>

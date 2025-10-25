@@ -1,10 +1,10 @@
 package com.ui;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -13,6 +13,11 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import com.networking.Client;
+import com.ui.Conversation.Message;
+import com.util.Button.ActivateAction;
+import com.util.Button.ButtonCircle;
+import com.util.Button.CustomButton;
+import com.util.Sounds.SoundPlayer;
 
 public class Panel extends JPanel implements ActionListener {
     private static JFrame frame = new JFrame("Semantic Compression");
@@ -26,20 +31,121 @@ public class Panel extends JPanel implements ActionListener {
     public static int changey = 0;
     public static int nexty = 100;
 
+    private static CustomButton newButton;
+    private static ArrayList<CustomButton> chatButtons = new ArrayList<>();
+    private static ButtonCircle circle = new ButtonCircle(new int[] { 0 });
 
+    private static Conversation currentConversation;
+    private static ArrayList<Conversation> conversations = new ArrayList<>();
+
+    private static Client client;
     static {
         frame.setLayout(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(1920, 1080);
 
+    }
+
+
+    public Conversation createEmptyConversation() {
+        Conversation con = new Conversation("000", "New Chat");
+        conversations.add(con);
+        setCustomButton("000");
+        return con;
 
     }
 
-    public void initGraphics(Client client) {
-        try{
+    public void drawConvo(ArrayList<Message> messages) {
+        for (Message m : messages) {
+            if (m.getRole().equals("user")) {
+                ChatBubble chatBubble = new ChatBubble(m.getContent(), nexty);
+                chatBubbles.add(chatBubble);
+                add(chatBubble);
+            }else{
+                Response r = new Response(m.getContent(), nexty, false);
+                responses.add(r);
+                add(r.label);
+            }
+        }
+    }
+
+    public void setCustomButton(String uuid) {
+        String name = "";
+
+            for (int i = 0; i<conversations.size(); i++){
+                
+                if (conversations.get(i).getID().equals(uuid)) {
+                    name = conversations.get(i).getName();
+
+                }
+            }
+        CustomButton button = new CustomButton(() -> {
+
+            for (int i = 0; i<conversations.size(); i++){
+                
+                if (conversations.get(i).getID().equals(uuid)) {
+                    drawConvo(conversations.get(i).load(client));
+                    break;
+                }
+            }
+
+            // conversation.load(uuid);
+
+        }, new ActivateAction());
+
+        button.addText(name);
+        button.setBounds(144,114+(150*chatButtons.size()-1));
+        chatButtons.add(button);
+
+        CustomButton.addButton(chatButtons.get(chatButtons.size() - 1));
+        
+        circle.addIndex(chatButtons.size()-1);
+        //CustomButton.addCircle(circle);
+
+        addMouseListener(chatButtons.get(chatButtons.size() - 1).getMyAction());
+        addMouseMotionListener(chatButtons.get(chatButtons.size() - 1).getMyAction());
+        requestFocus();
+        frame.revalidate();
+
+    }
+
+    public static void startChat(String chatid) {
+
+    }
+
+    public void initGraphics() {
+        try {
             backgroundImage = ImageIO.read(Panel.class.getResourceAsStream("/im/backgrounds/outline.png"));
             base = ImageIO.read(Panel.class.getResource("/im/backgrounds/base.png"));
-        }catch(Exception e){
+
+            newButton = new CustomButton(() -> {
+                /*
+                 * Requests new Conversation if not already loaded.
+                 */
+
+                currentConversation = createEmptyConversation();
+
+            }, new ActivateAction());
+            newButton.addImage(ImageIO.read(Panel.class.getResourceAsStream("/im/buttons/newButton.png")));
+            newButton.addButtonPressedImage(
+                    ImageIO.read(Panel.class.getResourceAsStream("/im/buttons/newButtonSel.png")));
+            newButton.setBounds(161, 31);
+
+            CustomButton.addButton(newButton);
+            CustomButton.addCircle(circle);
+            addMouseListener(newButton.getMyAction());
+            addMouseMotionListener(newButton.getMyAction());
+
+            // chatButton.setBounds()
+
+            // chatButton = new CustomButton(()->{
+            // /*
+            // * Requests new Conversation if not already loaded.
+            // */
+
+            // });
+            // chatButton.addText("Cool Chat");
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -52,16 +158,18 @@ public class Panel extends JPanel implements ActionListener {
             public void mouseWheelMoved(java.awt.event.MouseWheelEvent e) {
                 int notches = e.getWheelRotation();
                 changey -= notches * 20;
-                if(changey > 0) changey = 0;
-                if(changey < - nexty+200) changey = -nexty+200;
+                if (changey > 0)
+                    changey = 0;
+                if (changey < -nexty + 200)
+                    changey = -nexty + 200;
             }
 
         });
 
         add(inputArea);
-        
+
         frame.setContentPane(this);
-        //frame.add(this);
+        // frame.add(this);
         frame.setVisible(true);
 
         Timer t = new Timer(33, this);
@@ -70,13 +178,15 @@ public class Panel extends JPanel implements ActionListener {
     }
 
     public Panel(Client client) {
-        initGraphics(client);
+        Panel.client = client;
+        initGraphics();
     }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
+            new SoundPlayer();
             new Panel(new Client());
         });
-        
 
     }
 
@@ -87,37 +197,50 @@ public class Panel extends JPanel implements ActionListener {
         g2.drawImage(base, 545, 86, null);
 
         inputArea.draw(g2);
-        for(ChatBubble cb : chatBubbles){
+        for (ChatBubble cb : chatBubbles) {
             cb.draw(g2);
         }
 
-        for(Response r : responses){
-           r.draw(g2);
+        for (Response r : responses) {
+            r.draw(g2);
         }
-
 
         g2.drawImage(backgroundImage, 0, 0, null);
 
-    }   
+        newButton.draw(g2);
+        for(CustomButton b: chatButtons){
+            b.draw(g2);
+        }
+    }
 
     public void sendMessage(String message, Client client) {
-        // JLabel label = new JLabel();
-        // label.setText(message);
-        // label.setBounds(500, 300, 400, 50);
+
         ChatBubble chatBubble = new ChatBubble(message, nexty);
         chatBubbles.add(chatBubble);
         add(chatBubble);
-        System.out.println("asking server: "+message);
-        client.sendMessage(message);
-        responses.add(new Response(client.receiveMessages(), nexty));
-        add(responses.get(responses.size()-1).label); 
-        //add(label);
+        System.out.println("asking server: " + message);
+        if(currentConversation==null){
+            currentConversation = createEmptyConversation();
+        }
+        if (currentConversation.getUuid() == "000") {
+            currentConversation.addMessage("user", message);
+            // client.sendMessage(message);
+            Response r = client.newConversation(message, currentConversation);
+            responses.add(r);
+            add(r.label);
 
-        // revalidate();
-        // frame.revalidate();
+
+            return;
+        }
+        currentConversation.addMessage("user", message);
+        client.sendMessage(message);
+
+        responses.add(new Response(client.receiveMessages(), nexty, true));
+        add(responses.get(responses.size() - 1).label);
+
     }
 
-    @Override  
+    @Override
     public void actionPerformed(ActionEvent e) {
         repaint();
     }
