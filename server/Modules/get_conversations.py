@@ -1,28 +1,46 @@
-import uuid
 import os
 import json
 
-def get_conversations(user_uuid):
-    try:
-        user_conversations = os.listdir(f"server/users/{user_uuid}/conversations/")
+def get_conversations(user_uuid: str):
+    
+    base_path = os.path.join("server", "users", user_uuid, "conversations")
 
-        ''' {
-            "conversation_uuid_1": "conversation_name_1",
-            "conversation_uuid_2": "conversation_name_2",
-            ...
-        }
-        '''
-        for i in range(len(user_conversations)):
-            with open(f"server/users/{user_uuid}/conversations/{user_conversations[i]}/metadata.json", "r") as f:
-                try:
+    # Ensure user directory exists
+    os.makedirs(base_path, exist_ok=True)
+
+    # If no conversations yet, return empty list
+    if not os.path.isdir(base_path):
+        return []
+
+    conversations = []
+
+    for convo_uuid in os.listdir(base_path):
+        convo_path = os.path.join(base_path, convo_uuid)
+        if not os.path.isdir(convo_path):
+            continue  # skip files, only process folders
+
+        metadata_path = os.path.join(convo_path, "metadata.json")
+
+        # Default name in case metadata is missing or invalid
+        convo_name = "(untitled)"
+
+        if os.path.exists(metadata_path):
+            try:
+                with open(metadata_path, "r", encoding="utf-8") as f:
                     metadata = json.load(f)
-                except FileNotFoundError:
-                    pass
-                user_conversations[i] = {
-                    "conversation_uuid": user_conversations[i],
-                    "conversation_name": metadata["conversation_name"]
-                }
-    except FileNotFoundError:
-        user_conversations = []
-        os.makedirs(f"server/users/{user_uuid}/conversations/", exist_ok=True)
-    return user_conversations
+                    convo_name = metadata.get("conversation_name", convo_name)
+            except (json.JSONDecodeError, OSError):
+                pass  # ignore broken metadata files
+
+        conversations.append({
+            "uuid": convo_uuid,
+            "name": convo_name
+        })
+
+    # Sort by last modified time (newest first)
+    conversations.sort(
+        key=lambda c: os.path.getmtime(os.path.join(base_path, c["uuid"])),
+        reverse=True
+    )
+
+    return conversations
