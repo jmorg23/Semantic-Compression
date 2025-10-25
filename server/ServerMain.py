@@ -1,6 +1,7 @@
 import json
 import socket
 import threading
+from groq_api_key import key
 
 from time import sleep
 
