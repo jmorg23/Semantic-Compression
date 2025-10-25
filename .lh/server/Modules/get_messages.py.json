@@ -1,0 +1,154 @@
+{
+    "sourceFile": "server/Modules/get_messages.py",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 34,
+            "patches": [
+                {
+                    "date": 1761396802613,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1761396963184,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,2 +1,3 @@\n def get_messages():\r\n+    \r\n     pass\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761397078267,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,3 +1,3 @@\n-def get_messages():\r\n-    \r\n+def get_messages(user_uuid:str=None, conversation_id:str=None):\r\n+\r\n     pass\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761397083339,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,3 +1,3 @@\n-def get_messages(user_uuid:str=None, conversation_id:str=None):\r\n+def get_messages(user_uuid:str=None, conversation_uuid:str=None):\r\n \r\n     pass\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761397090675,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,3 +1,3 @@\n-def get_messages(user_uuid:str=None, conversation_uuid:str=None):\r\n+def get_messages(user_uuid:str, conversation_uuid:str=None):\r\n \r\n     pass\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761397105304,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,3 +1,3 @@\n-def get_messages(user_uuid:str, conversation_uuid:str=None):\r\n-\r\n+def get_messages(user_uuid:str, conversation_uuid:str):\r\n+    \r\n     pass\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761401094538,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,3 +1,3 @@\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    \r\n-    pass\n\\ No newline at end of file\n+\r\n+    return {}\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761401103585,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,3 +1,3 @@\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n \r\n-    return {}\n\\ No newline at end of file\n+    return []\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761401109599,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,3 +1,5 @@\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n \r\n-    return []\n\\ No newline at end of file\n+    return [{\r\n+        \r\n+    }]\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761401116473,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,8 @@\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n \r\n-    return [{\r\n-        \r\n-    }]\n\\ No newline at end of file\n+    return [\r\n+        {\r\n+        \"role\": \"system\",\r\n+        \"content\": \"You are a helpful assistant.\"\r\n+    }\r\n+    ]\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404708578,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,3 @@\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n \r\n-    return [\r\n-        {\r\n-        \"role\": \"system\",\r\n-        \"content\": \"You are a helpful assistant.\"\r\n-    }\r\n-    ]\n\\ No newline at end of file\n+    return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404731746,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,3 +1,5 @@\n+\r\n+\r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n \r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404737512,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n+import \r\n \r\n-\r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n \r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404747788,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,6 @@\n-import \r\n+import os\r\n+im\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n \r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404754973,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n-im\r\n+import \r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n \r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404818268,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n-import \r\n+import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n \r\n\\ No newline at end of file\n-    return\n+    return \n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404905725,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-\r\n-    return \n\\ No newline at end of file\n+    \r\n+    return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404912325,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    \r\n+    conv\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404918956,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    conv\r\n+    convo_\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404929230,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_\r\n+    convo_path = \r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404937234,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = \r\n+    convo_path = os.path\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404946481,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path\r\n+    convo_path = os.path.join(\"conversations\", conversation_uuid + \".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404978479,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"conversations\", conversation_uuid + \".json\")\r\n+    convo_path = os.path.join(\"s\", conversation_uuid + \".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761404987416,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"s\", conversation_uuid + \".json\")\r\n+    convo_path = os.path.join(\"users\", conveuuid + \".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761405002805,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"users\", conveuuid + \".json\")\r\n+    convo_path = os.path.join(\"users\", uuid + \".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761405009234,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"users\", uuid + \".json\")\r\n+    convo_path = os.path.join(\"users\", user_uuid + \".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761405022993,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"users\", user_uuid + \".json\")\r\n+    convo_path = os.path.join(\"conversations\", conversation_uuid + \".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761405031016,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"conversations\", conversation_uuid + \".json\")\r\n+    convo_path = os.path.join(\"\"\"conversations\", conversation_uuid + \".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761405036730,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"\"\"conversations\", conversation_uuid + \".json\")\r\n+    convo_path = os.path.join(\"user\"\"conversations\", conversation_uuid + \".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761405045079,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"user\"\"conversations\", conversation_uuid + \".json\")\r\n+    convo_path = os.path.join(\"users\"\"\"conversations\", conversation_uuid + \".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761405072528,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"users\"\"\"conversations\", conversation_uuid + \".json\")\r\n+    convo_path = os.path.join(\"users\", \"conversations\", conversation_uuid + \".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761405083956,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"users\", \"conversations\", conversation_uuid + \".json\")\r\n+    convo_path = os.path.join(\"users\", user_uuid, \"conversations\", conversation_uuid + \".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761405101230,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"users\", user_uuid, \"conversations\", conversation_uuid + \".json\")\r\n+    convo_path = os.path.join(\"users\", user_uuid, \"conversations\", conversation_uuid\".json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761405108392,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n import os\r\n import json\r\n \r\n def get_messages(user_uuid:str, conversation_uuid:str):\r\n-    convo_path = os.path.join(\"users\", user_uuid, \"conversations\", conversation_uuid, \".json\")\r\n+    convo_path = os.path.join(\"users\", user_uuid, \"conversations\", conversation_uuid, \"coversation.json\")\r\n     return\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1761405190231,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,7 @@\n+import os\r\n+import json\r\n+\r\n+def get_messages(user_uuid:str, conversation_uuid:str):\r\n+    convo_path = os.path.join(\"users\", user_uuid, \"conversations\", conversation_uuid, \"coversation.json\")\r\n+    with open(convo_path, \"r\", encoding=\"utf-8\") as f:\r\n+        return json.load(open(convo_path, \"r\"))[\"messages\"]\n\\ No newline at end of file\n"
+                }
+            ],
+            "date": 1761396802613,
+            "name": "Commit-0",
+            "content": "def get_messages():\r\n    pass"
+        }
+    ]
+}
