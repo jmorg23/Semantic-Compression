@@ -15,27 +15,27 @@ public class Response  {
     public JLabel label;
     
     private int y;
-    private int x = 50;
+    private int x = 550;
 
     private int index = 0;
-    
-    private String con = "Yes — you can make a `JTextArea` **transparent** (invisible background) while still being **fully functional and editable**.\r\n" + //
+    // private String con;
+    // private String con = "Yes — you can make a `JTextArea` **transparent** (invisible background) while still being **fully functional and editable**.\r\n" + //
 
-                "\r\n" + //
-                "* `setOpaque(false)` tells Swing not to paint the background.\r\n" + //
-                "* Setting `new Color(0,0,0,0)` ensures any background color is *fully transparent*.\r\n" + //
-                "* It will still **receive focus, caret, and key events**, so typing works normally.\r\n" + //
-                "* You can use this trick to overlay text input on top of images or game scenes.\r\n" + //
-                "\r\n" + //
-                "---\r\n" + //
-                "\r\n" + //
-                "Would you like me to show how to overlay a transparent `JTextArea` **on top of a background image or custom canvas** (like in a chat UI or game)?\r\n" + //
-                "";
+    //             "\r\n" + //
+    //             "* `setOpaque(false)` tells Swing not to paint the background.\r\n" + //
+    //             "* Setting `new Color(0,0,0,0)` ensures any background color is *fully transparent*.\r\n" + //
+    //             "* It will still **receive focus, caret, and key events**, so typing works normally.\r\n" + //
+    //             "* You can use this trick to overlay text input on top of images or game scenes.\r\n" + //
+    //             "\r\n" + //
+    //             "---\r\n" + //
+    //             "\r\n" + //
+    //             "Would you like me to show how to overlay a transparent `JTextArea` **on top of a background image or custom canvas** (like in a chat UI or game)?\r\n" + //
+    //             "";
     public Response(String message, int ypos){
         this.message = message;
         this.y = ypos;
-        message = con;
-        this.message = con;
+        // message = con;
+        // this.message = con;
         Parser parser = Parser.builder().build();
         HtmlRenderer renderer = HtmlRenderer.builder().build();
         String html = renderer.render(parser.parse(message));
@@ -43,8 +43,11 @@ public class Response  {
         label.setVerticalAlignment(SwingConstants.TOP);
         // label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         
-        con = "<html>" + html + "</html>";
-        label.setText(con);
+        label.setForeground(java.awt.Color.WHITE);
+        label.setFont(new Font("Segoe UI", Font.PLAIN, 30));
+
+        this.message = "<html>" + html + "</html>";
+        label.setText(message);
         label.setBounds(x, y, 1000, 2000);
         Dimension size = label.getPreferredSize();
         Panel.nexty+=size.height+50;
@@ -57,8 +60,8 @@ public class Response  {
 
     public void draw(java.awt.Graphics2D g2){
         label.setBounds(label.getX(), y+Panel.changey, label.getWidth(), label.getHeight());
-        if(index < con.length()){
-            label.setText(con.substring(0,index++));
+        if(index < message.length()){
+            label.setText(message.substring(0,index++));
 
         }
 

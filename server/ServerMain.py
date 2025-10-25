@@ -24,18 +24,26 @@ class Client:
     def send_message(self, message):
         connection = self.connection
         json_str = json.dumps(message.__dict__)
-        print(json_str)
+        # print(json_str)
         connection.sendall(json_str.encode())
     def loop(self):
         while True:
             connection = self.connection
             print("Waiting for data from client...")
-            data = connection.recv(1024)
+            data = connection.recv(4096)
             if not data:
                 break
 
             message = data.decode()
             print("Received:", message)
+            message = json.loads(message)
+            input_message = InputMessage(**message)
+            message = input_message.content
+            timestamp = input_message.timestamp
+            limit = input_message.limit
+
+            self.messages.append({"role": "user", "content": message})
+
 
             response = client.chat.completions.create(
                 messages=self.messages,
@@ -45,15 +53,19 @@ class Client:
             )
 
             message = ''
-            self.send_message(message, 1)
+            self.send_message(Message(message, 1))
             for chunk in response:
                 if chunk.choices[0].delta.content:
-                    # message += chunk.choices[0].delta.content
+                    message += chunk.choices[0].delta.content
                     token = chunk.choices[0].delta.content
-                    self.send_message(Message(token, 0))
-                    print(chunk.choices[0].delta.content, end="", flush=True)
-            self.send_message(Message("", -1))
+                    print(Message(token.strip(), 0))
+                    # self.send_message(Message(token.strip(), 0)) #!-----------------------------
+                    # print(chunk.choices[0].delta.content, end="", flush=True)
+            
+            self.send_message(Message(message, -1))
+            print(Message(message, -1).message)
 
+            self.messages.append({"role": "assistant", "content": message})
 
             # self.send_message(Message("a", 1))
             # sleep(0.01)
@@ -89,7 +101,7 @@ class ServerMain:
             connection, client_address = server_socket.accept()
             try:
                 print("Connection from", client_address)
-                data = json.loads(connection.recv(1024).decode())
+                data = json.loads(connection.recv(4096).decode())
                 client_info = ClientInfo(**data)
                 
                 
@@ -129,7 +141,14 @@ class ClientInfo:
     def __init__(self, id):
         self.id = id
 
-    
+class InputMessage:
+    content: str
+    timestamp: int
+    limit: int = 10
+    def __init__(self, content, timestamp, limit=10):
+        self.content = content
+        self.timestamp = timestamp
+        self.limit = limit
 
 
 if __name__ == "__main__":

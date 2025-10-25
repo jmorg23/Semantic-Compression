@@ -19,10 +19,10 @@ public class ChatBubble extends JTextArea{
 
     public ChatBubble(String text, int starty) {
         y = starty;
-        x = 1200;
+        x = 1425;
         bounds = new RoundRectangle2D.Double(x, y, maxWidth, 50, 25, 25);
         setBounds(x, y, 10, 10);
-        setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        setFont(new Font("Segoe UI", Font.PLAIN, 35));
 
         setOpaque(false); // removes default background
         setBackground(new Color(0, 0, 0, 0)); // fully transparent
@@ -53,7 +53,6 @@ public class ChatBubble extends JTextArea{
         // Temporarily set width to compute correct height with wrapping
         setBounds(x,y,width, Short.MAX_VALUE);
         height = getPreferredSize().height;
-        System.out.println("Preferred Height: " + height);
 
         // Apply calculated dimensions
         setBounds(x,y,width, height);
@@ -70,7 +69,7 @@ public class ChatBubble extends JTextArea{
 
     public void draw(Graphics2D g2) {
 
-        bounds = new RoundRectangle2D.Double(x, y+Panel.changey, width, height, 25, 25);
+        bounds = new RoundRectangle2D.Double(x-10, y+Panel.changey, width+10, height, 25, 25);
         setBounds(getX(), y+Panel.changey, getWidth(), getHeight());
         g2.fill(bounds);
 

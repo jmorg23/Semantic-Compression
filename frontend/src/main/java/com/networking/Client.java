@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,52 +37,106 @@ public class Client {
             os.write(mapper.writeValueAsString(myInfo).getBytes());
             os.flush();
 
-            Scanner s = new Scanner(System.in);
-            System.out.print("enter message to send: ");
-            os.write(mapper.writeValueAsString(s.nextLine()).getBytes());
-            os.flush();
-            s.close();
 
-            receiveMessages();
+            // os.write(mapper.writeValueAsString(s.nextLine()).getBytes());
+            // os.flush();
+            
+
+            
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
     }
+    // public void sendMessage(String message) {
+    //     try {
+    //         os.write(mapper.writeValueAsString(message).getBytes());
+    //         os.flush();
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
 
-    public void receiveMessages() {
+    //     }
+    // }
+    public String receiveMessages() {
 
         while (true) {
 
             try {
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[4096];
 
                 is.read(buffer);
                 String received = new String(buffer).trim();
+                System.out.println("rec: "+received);
                 Packet packet = mapper.readValue(received, Packet.class);
-                System.out.println("received message: " + packet.getMessage() + " of type " + packet.getType());
-                if(packet.getType() == -1) {
-                   System.out.println("done");
-                    break;
-                }
+                System.out.println("received message: " + packet.getMessage()+ " of type "+packet.getType());
+
+                return packet.getMessage();
+                // if(packet.getType() == -1) {
+                //    System.out.println("done");
+                //     break;
+                // }
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
         }
     }
+    // public void sendMessage(String message) {
+    //     try {
+    //         os.write(mapper.writeValueAsString(message).getBytes());
+    //         os.flush();
+    //         receiveMessages();
+    //     } catch (IOException e) {
+    //         e.printStackTrace();
 
+    //     }
+    // }
     public void sendMessage(String message) {
         Message msg = new Message("" + System.currentTimeMillis(), message, 10);
         try {
             os.write(mapper.writeValueAsString(msg).getBytes());
             os.flush();
+            receiveMessages();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    public class Response {
+        private String role;
+        private String content;
+        private int type;
+        public String getRole() {
+            return role;
+        }
+        public void setRole(String role) {
+            this.role = role;
+        }
+        public String getContent() {
+            return content;
+        }
+        public Response() {
+        }
+        public Response(String role, String content, int type) {
+            this.role = role;
+            this.content = content;
+            this.type = type;
+        }
+        public void setContent(String content) {
+            this.content = content;
+        }
+        public int getType() {
+            return type;
+        }
+        public void setType(int type) {
+            this.type = type;
+        }
+
+        
+
+
+    }
     public static class ClientInfo {
 
         private String id;
@@ -130,7 +185,7 @@ public class Client {
     public static class Message {
         private String timestamp;
         private String content;
-        private int limit;
+        private int limit =10;
 
         public Message() {
         }
