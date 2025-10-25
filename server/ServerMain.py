@@ -2,16 +2,23 @@ import json
 import socket
 import threading
 from groq_api_key import key
+from groq import Groq
+
+client = Groq(
+    api_key=key
+)
+
+model = "llama-3.3-70b-versatile"
 
 from time import sleep
 
 class Client:
-
     id :str
     connection = None
     def __init__(self, connection, id):
         self.connection = connection
         self.id = id
+        self.messages = []
         pass
 
     def send_message(self, message):
@@ -26,22 +33,43 @@ class Client:
             data = connection.recv(1024)
             if not data:
                 break
-            print("Received:", data.decode())
+
+            message = data.decode()
+            print("Received:", message)
+
+            response = client.chat.completions.create(
+                messages=self.messages,
+                model=model,
+                max_tokens=2048,
+                stream=True,
+            )
+
+            message = ''
+            self.send_message(message, 1)
+            for chunk in response:
+                if chunk.choices[0].delta.content:
+                    # message += chunk.choices[0].delta.content
+                    token = chunk.choices[0].delta.content
+                    self.send_message(Message(token, 0))
+                    print(chunk.choices[0].delta.content, end="", flush=True)
+            self.send_message(Message("", -1))
 
 
-            self.send_message(Message("a", 1))
-            sleep(0.01)
-            self.send_message(Message("Message from server", 0))
-            sleep(0.01)
-            self.send_message(Message("Message from server", 0))
-            sleep(0.01)
-            self.send_message(Message("Message from server", 0))
-            sleep(0.01) 
-            self.send_message(Message("Message from server", 0))
-            sleep(0.01) 
-            self.send_message(Message("Message from server", 0))
-            sleep(0.01)
-            self.send_message(Message("Message from server", -1))
+            # self.send_message(Message("a", 1))
+            # sleep(0.01)
+            # self.send_message(Message("Message from server", 0))
+            # sleep(0.01)
+            # self.send_message(Message("Message from server", 0))
+            # sleep(0.01)
+            # self.send_message(Message("Message from server", 0))
+            # sleep(0.01)
+            # self.send_message(Message("Message from server", 0))
+            # sleep(0.01) 
+            # self.send_message(Message("Message from server", 0))
+            # sleep(0.01) 
+            # self.send_message(Message("Message from server", 0))
+            # sleep(0.01)
+            # self.send_message(Message("Message from server", -1))
 
 
 
